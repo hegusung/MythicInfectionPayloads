@@ -1,0 +1,9 @@
+FROM itsafeaturemythic/mythic_python_go:latest
+
+RUN pip3 install mythic_container==0.5.12 
+
+RUN pip3 install pyminizip py7zr pycdlib cabarchive
+
+WORKDIR /Mythic/
+
+CMD ["python3", "main.py"]
