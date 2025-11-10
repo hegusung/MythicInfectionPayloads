@@ -58,7 +58,7 @@ class PackMyPayload(PayloadType):
 
     ]
     agent_path = pathlib.Path(".") / "archive"
-    agent_icon_path = agent_path / "agent_functions" / "basic_python_agent.svg"
+    agent_icon_path = agent_path / "agent_functions" / "archive.svg"
     agent_code_path = agent_path / "agent_code"
 
     build_steps = [

@@ -74,7 +74,7 @@ class encoded_script_builder(PayloadType):
     note = """Creates a Encoded version of a JScript or VBScript script"""
     translation_container = None # "myPythonTranslation"
     agent_path = pathlib.Path(".") / "clickable"
-    agent_icon_path = agent_path / "agent_functions" / "basic_python_agent.svg"
+    agent_icon_path = agent_path / "agent_functions" / "click.svg"
     agent_code_path = agent_path / "agent_code"
     build_parameters = [
     ]

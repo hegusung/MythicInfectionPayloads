@@ -18,14 +18,12 @@ class jscript_download_save_execute(PayloadType):
     file_extension = "js"
     author = "@hegusung"
     supported_os = [SupportedOS.Windows]
-    wrapper = False
+    wrapper = True
+    wrapped_payloads = ["*"]
     note = """Downloads a payload from the C2, save it on disk and execute"""
-    supports_dynamic_loading = True
-    c2_profiles = []
-    mythic_encrypts = True
     translation_container = None # "myPythonTranslation"
     agent_path = pathlib.Path(".") / "jscript"
-    agent_icon_path = agent_path / "agent_functions" / "basic_python_agent.svg"
+    agent_icon_path = agent_path / "agent_functions" / "jscript.svg"
     agent_code_path = agent_path / "agent_code"
     build_parameters = [
         BuildParameter(

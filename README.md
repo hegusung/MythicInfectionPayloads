@@ -32,6 +32,7 @@ Currently the following payloads are implemented:
 
 - cmd_to_lnk
 - script_to_hta
+- script_to_wsf
 - script_to_sct
 
 ### LOLBas
@@ -46,4 +47,5 @@ Currently the following payloads are implemented:
 ### Phishing kits
 
 - clickfix
+- filefix
 

