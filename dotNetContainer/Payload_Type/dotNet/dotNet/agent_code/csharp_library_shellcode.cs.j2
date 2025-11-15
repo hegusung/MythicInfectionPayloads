@@ -1,0 +1,25 @@
+using System;
+using System.Runtime.InteropServices;
+{{imports}}
+
+namespace ShellcodeLoader
+{
+
+    [ComVisible(true)]
+    public class Bypass
+    {
+
+        public static void Run ()
+        {
+{{code}}
+        }
+
+{{export_funcs}}
+
+{{pinvokes}}
+
+    }
+
+{{other_class}}
+
+}
